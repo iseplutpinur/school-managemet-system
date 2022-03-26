@@ -75,7 +75,7 @@
                 $active = false;
                 foreach ($children as  $child) {
                     $child_filter = filterMenu($child);
-                    $child_menu .= '<li class="'.$child_filter->active_class.'"><a href="'.$child_filter->route.'"><i class="ti-more">'.$child_filter->title.'</i></a></li>';
+                    $child_menu .= '<li class="'.$child_filter->active_class.'"><a href="'.$child_filter->route.'"><i class="ti-more"></i>'.$child_filter->title.'</a></li>';
                     if ($child_filter->active) $active = $child_filter->active;
                 }
                 $active_1 = $active ? ' menu-open active' : '';
@@ -85,7 +85,7 @@
 
             }else{
                 $menu = filterMenu($menu);
-                $menu_body .= "<li class=\"$menu->active_class\"> <a href=\"$menu->route\"> $menu->icon <span>Dashboard</span> </a> </li>";
+                $menu_body .= "<li class=\"$menu->active_class\"> <a href=\"$menu->route\"> $menu->icon <span>$menu->title</span> </a> </li>";
             }
 
         }
