@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\AdminController;
+
+// user
+use App\Http\Controllers\Backend\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,14 +18,16 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return view('auth.login');
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return view('admin.index');
 })->name('dashboard');
+
+Route::get('admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
+
+
+// user management all route
+Route::get('user/view', [UserController::class, 'userView'])->name('user.view');
+Route::get('user/add', [UserController::class, 'userAdd'])->name('user.add');
