@@ -22,12 +22,14 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return view('admin.index');
+    return view('admin.index', ['page_attr' => ['title' => 'Dashboard']]);
 })->name('dashboard');
 
 Route::get('admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
 
 // user management all route
-Route::get('user/view', [UserController::class, 'userView'])->name('user.view');
-Route::get('user/add', [UserController::class, 'userAdd'])->name('user.add');
+Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'verified']], function () {
+    Route::get('view', [UserController::class, 'userView'])->name('user.view');
+    Route::get('add', [UserController::class, 'userAdd'])->name('user.add');
+});

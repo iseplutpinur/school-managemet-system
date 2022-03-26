@@ -11,6 +11,13 @@ class UserController extends Controller
     public function userView()
     {
         $users = User::all();
-        return view('backend.user.view_user', compact('users'));
+        $page_attr = [
+            'title' => 'View User',
+            'breadcrumbs' => [
+                ['name' => 'Manage User'],
+            ],
+            'navigation' => 'user.view',
+        ];
+        return view('backend.user.view_user', compact('users', 'page_attr'));
     }
 }

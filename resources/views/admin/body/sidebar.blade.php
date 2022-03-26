@@ -2,7 +2,6 @@
     // variable declaration
     $menus = [];
 
-
     $menus[] = [ 'title' => 'Dashboard', 'route' =>'dashboard', 'icon' => '<i data-feather="pie-chart"></i>'];
     $menus[] = [ 'title' => 'Manage User',
         'icon' => '<i data-feather="message-circle"></i>',
@@ -38,16 +37,19 @@
 
     // separator example
     $menus[] = [ 'title' => 'User Interface', 'separator' => false ];
-    function sidebarMenu(Array $menus):string {
-        function checkActive($route):bool {
-            return request()->routeIs($route);
+
+
+    // main function
+    function sidebarMenu(Array $menus, $navigation):string {
+        function checkActive($route, $navigation):bool {
+            return request()->routeIs($route) || ($navigation == $route);
         }
 
-        function filterMenu($menu):object{
+        function filterMenu($menu, $navigation):object{
             $title = isset($menu['title']) ? $menu['title'] : '';
             $icon = isset($menu['icon']) ? $menu['icon'] : '';
             $route = isset($menu['route']) ? $menu['route'] : '#';
-            $active = checkActive($route);
+            $active = checkActive($route, $navigation);
             $active_class = $active ? 'active' : '';
             $route = $route == '#' ? '#' : route($route);
 
@@ -74,17 +76,17 @@
                 $child_menu = '';
                 $active = false;
                 foreach ($children as  $child) {
-                    $child_filter = filterMenu($child);
+                    $child_filter = filterMenu($child, $navigation);
                     $child_menu .= '<li class="'.$child_filter->active_class.'"><a href="'.$child_filter->route.'"><i class="ti-more"></i>'.$child_filter->title.'</a></li>';
                     if ($child_filter->active) $active = $child_filter->active;
                 }
                 $active_1 = $active ? ' menu-open active' : '';
                 $active_2 = $active ? ' style="display: block;"' : '';
-                $menu = filterMenu($menu);
+                $menu = filterMenu($menu, $navigation);
                 $menu_body .= '<li class="treeview '.$active_1.'"><a href="#">'.$menu->icon.'<span>'.$menu->title.'</span><span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span></a><ul class="treeview-menu" '. $active_2 .'>'. $child_menu .'</ul></li>';
 
             }else{
-                $menu = filterMenu($menu);
+                $menu = filterMenu($menu, $navigation);
                 $menu_body .= "<li class=\"$menu->active_class\"> <a href=\"$menu->route\"> $menu->icon <span>$menu->title</span> </a> </li>";
             }
 
@@ -115,7 +117,7 @@
         </div>
 
         <!-- sidebar menu-->
-        {!! sidebarMenu($menus) !!}
+        {!! sidebarMenu($menus, $page_attr_navigation) !!}
 
     </section>
 
