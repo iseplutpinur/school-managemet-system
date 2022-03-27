@@ -20,6 +20,10 @@
         ]
     ];
 
+    // separator example
+    $menus[] = [ 'title' => 'Datatable', 'separator' => true ];
+
+    $menus[] = [ 'title' => 'Company', 'icon' => '<i data-feather="grid"></i>', 'route'=>'company'];
 
     $menus[] = [ 'title' => 'Components',
         'icon' => '<i data-feather="grid"></i>',
@@ -35,8 +39,7 @@
         ]
     ];
 
-    // separator example
-    $menus[] = [ 'title' => 'User Interface', 'separator' => false ];
+
 
 
     // main function

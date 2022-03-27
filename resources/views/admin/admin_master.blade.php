@@ -6,6 +6,7 @@ $page_attr = (object)[
     'navigation' => isset($page_attr['navigation']) ? $page_attr['navigation'] : false,
     'breadcrumbs' => isset($page_attr['breadcrumbs']) ? (is_array($page_attr['breadcrumbs']) ? $page_attr['breadcrumbs'] : false) : false,
 ];
+$page_attr_title = (($page_attr->title == '') ? '' : $page_attr->title . ' | ') . (env('APP_NAME') ?? '');
 ?>
 
 <!DOCTYPE html>
@@ -18,8 +19,9 @@ $page_attr = (object)[
     <meta name="description" content="{{ $page_attr->description }}">
     <meta name="author" content="{{ $page_attr->author }}">
     <link rel="icon" href="{{ asset('backend/images/favicon.ico') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-    <title>{{ $page_attr->title == '' ? '' : $page_attr->title . ' | ' . env('APP_NAME') }}</title>
+    <title>{{ $page_attr_title }}</title>
 
     <!-- Vendors Style-->
     <link rel="stylesheet" href="{{ asset('backend/css/vendors_css.css') }}">

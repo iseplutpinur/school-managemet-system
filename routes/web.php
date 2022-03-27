@@ -6,6 +6,9 @@ use App\Http\Controllers\AdminController;
 // user
 use App\Http\Controllers\Backend\UserController;
 
+use App\Http\Controllers\CompanyController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,3 +36,9 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'verified']],
     Route::get('view', [UserController::class, 'userView'])->name('user.view');
     Route::get('add', [UserController::class, 'userAdd'])->name('user.add');
 });
+
+
+Route::get('ajax-crud-datatable', [CompanyController::class, 'index'])->name('company');
+Route::post('store-company', [CompanyController::class, 'store']);
+Route::post('edit-company', [CompanyController::class, 'edit']);
+Route::post('delete-company', [CompanyController::class, 'destroy']);
