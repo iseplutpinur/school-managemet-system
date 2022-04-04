@@ -17,7 +17,7 @@ class CompanyController extends Controller
                 ->addIndexColumn()
                 ->make(true);
         }
-        return view('backend.user.company');
+        return view('backend.company');
     }
 
 

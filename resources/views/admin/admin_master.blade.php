@@ -1,12 +1,12 @@
 <?php
-$page_attr = (object)[
-    'title' => isset($page_attr['title']) ? $page_attr['title']: '',
-    'description' => isset($page_attr['description']) ? $page_attr['description']: '',
-    'author' => isset($page_attr['author']) ? $page_attr['author']: '',
+$page_attr = (object) [
+    'title' => isset($page_attr['title']) ? $page_attr['title'] : '',
+    'description' => isset($page_attr['description']) ? $page_attr['description'] : '',
+    'author' => isset($page_attr['author']) ? $page_attr['author'] : '',
     'navigation' => isset($page_attr['navigation']) ? $page_attr['navigation'] : false,
     'breadcrumbs' => isset($page_attr['breadcrumbs']) ? (is_array($page_attr['breadcrumbs']) ? $page_attr['breadcrumbs'] : false) : false,
 ];
-$page_attr_title = (($page_attr->title == '') ? '' : $page_attr->title . ' | ') . (env('APP_NAME') ?? '');
+$page_attr_title = ($page_attr->title == '' ? '' : $page_attr->title . ' | ') . (env('APP_NAME') ?? '');
 ?>
 
 <!DOCTYPE html>
@@ -29,6 +29,8 @@ $page_attr_title = (($page_attr->title == '') ? '' : $page_attr->title . ' | ') 
     <!-- Style-->
     <link rel="stylesheet" href="{{ asset('backend/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('backend/css/skin_color.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('backend/assets/vendor_components/jquery-toast-plugin-master/src/jquery.toast.css') }}">
     @yield('stylesheet')
 </head>
 
@@ -43,38 +45,40 @@ $page_attr_title = (($page_attr->title == '') ? '' : $page_attr->title . ' | ') 
         <div class="content-wrapper">
             <div class="container-full">
                 @if ($page_attr->breadcrumbs)
-                <!-- Content Header (Page header) -->
-                <div class="content-header">
-                    <div class="d-flex align-items-center">
-                        <div class="mr-auto">
-                            <h3 class="page-title">{{ $page_attr->title }}</h3>
-                            <div class="d-inline-block align-items-center">
-                                <nav>
-                                    <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"
-                                                title="Go To Dashboard"><i class="mdi mdi-home-outline"></i></a>
-                                        </li>
-                                        @foreach ($page_attr->breadcrumbs as $breadcrumb)
-                                        @if (isset($breadcrumb['name']))
-                                        <li class="breadcrumb-item" aria-current="{{ $page_attr->title }}">
-                                            @if (isset($breadcrumb['url']))
-                                            <a href="{{ $breadcrumb['url'] }}"
-                                                title="Page To {{ $breadcrumb['name'] }}">{{ $breadcrumb['name'] }}</a>
-                                            @else
-                                            {{ $breadcrumb['name'] }}
-                                            @endif
-                                        </li>
-                                        @endif
-                                        @endforeach
+                    <!-- Content Header (Page header) -->
+                    <div class="content-header">
+                        <div class="d-flex align-items-center">
+                            <div class="mr-auto">
+                                <h3 class="page-title">{{ $page_attr->title }}</h3>
+                                <div class="d-inline-block align-items-center">
+                                    <nav>
+                                        <ol class="breadcrumb">
+                                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"
+                                                    title="Go To Dashboard"><i class="mdi mdi-home-outline"></i></a>
+                                            </li>
+                                            @foreach ($page_attr->breadcrumbs as $breadcrumb)
+                                                @if (isset($breadcrumb['name']))
+                                                    <li class="breadcrumb-item"
+                                                        aria-current="{{ $page_attr->title }}">
+                                                        @if (isset($breadcrumb['url']))
+                                                            <a href="{{ $breadcrumb['url'] }}"
+                                                                title="Page To {{ $breadcrumb['name'] }}">{{ $breadcrumb['name'] }}</a>
+                                                        @else
+                                                            {{ $breadcrumb['name'] }}
+                                                        @endif
+                                                    </li>
+                                                @endif
+                                            @endforeach
 
-                                        <li class="breadcrumb-item active" aria-current="{{ $page_attr->title }}">
-                                            {{ $page_attr->title }}</li>
-                                    </ol>
-                                </nav>
+                                            <li class="breadcrumb-item active"
+                                                aria-current="{{ $page_attr->title }}">
+                                                {{ $page_attr->title }}</li>
+                                        </ol>
+                                    </nav>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 @endif
 
                 <!-- Main content -->
@@ -97,10 +101,26 @@ $page_attr_title = (($page_attr->title == '') ? '' : $page_attr->title . ' | ') 
     <!-- Vendor JS -->
     <script src="{{ asset('backend/js/vendors.min.js') }}"></script>
     <script src="{{ asset('backend/assets/icons/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/vendor_components/jquery-toast-plugin-master/src/jquery.toast.js') }}">
+    </script>
 
     <!-- Sunny Admin App -->
     <script src="{{ asset('backend/js/template.js') }}"></script>
     @yield('javascript')
+    <script>
+        function setBtnLoading(element, text, status = true) {
+            const el = $(element);
+            if (status) {
+                el.attr("disabled", "");
+                el.html(
+                    `<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span> ${text}`
+                );
+            } else {
+                el.removeAttr("disabled");
+                el.html(text);
+            }
+        }
+    </script>
 </body>
 
 </html>
