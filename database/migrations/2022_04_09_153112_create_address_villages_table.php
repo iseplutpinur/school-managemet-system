@@ -15,7 +15,7 @@ class CreateAddressVillagesTable extends Migration
     {
         Schema::create('address_villages', function (Blueprint $table) {
             $table->char('id', 10)->primary();
-            $table->char('district_id', 10)->nullable();
+            $table->char('district_id', 7)->nullable();
             $table->string('name');
             $table->timestamps();
             $table->foreign('district_id')
