@@ -210,10 +210,16 @@
                         name: 'id',
                         render(data, type, full, meta) {
                             return `
-                            <button type="button" class="btn btn-rounded btn-primary" title="Edit Data" onClick="editFunc('${data}')">
+                            <button type="button" class="btn btn-rounded btn-primary btn-md" title="Edit Data"
+                                data-id="${full.id}"
+                                data-name="${full.name}"
+                                data-email="${full.email}"
+                                data-role="${full.role}"
+                                data-active="${full.active}"
+                            onClick="editFunc(this)">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                             </button>
-                            <button type="button" class="btn btn-rounded btn-danger" title="Delete Data" onClick="deleteFunc('${data}')">
+                            <button type="button" class="btn btn-rounded btn-danger btn-md" title="Delete Data" onClick="deleteFunc('${data}')">
                                 <i class="fa fa-trash" aria-hidden="true"></i> Delete
                             </button>
                         `;
@@ -225,6 +231,7 @@
                     [1, 'asc']
                 ]
             });
+
             new_table.on('draw.dt', function() {
                 var PageInfo = table_html.DataTable().page.info();
                 new_table.column(0, {
@@ -233,6 +240,7 @@
                     cell.innerHTML = i + 1 + PageInfo.start;
                 });
             });
+
             $('#FilterForm').submit(function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
@@ -240,17 +248,18 @@
                 oTable.fnDraw(false);
             });
 
-
-
             // insertForm ===================================================================================
             $('#UserForm').submit(function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
                 setBtnLoading('#btn-save', 'Save Changes');
                 resetErrorAfterInput();
+                const route = ($('#id').val() == '') ? "{{ route('admin.user.store') }}" :
+                    "{{ route('admin.user.update') }}";
+
                 $.ajax({
-                    type: 'POST',
-                    url: "{{ route('admin.user.store') }}",
+                    type: "POST",
+                    url: route,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -304,14 +313,10 @@
                 setBtnLoading('#btn-save-delete', 'Delete');
                 $.ajax({
                     type: "DELETE",
-                    url: "{{ route('admin.user.delete') }}",
+                    url: "{{ url('admin/user') }}/" + formData.get('id'),
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    data: formData,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
                     dataType: 'json',
                     success: function(res) {
                         $.toast({
@@ -354,26 +359,21 @@
             $('#modal-default').modal('show');
             $('#id').val('');
             resetErrorAfterInput();
+            $('#password').attr('required', true);
         }
 
 
-        function editFunc(id) {
-            $.ajax({
-                type: "POST",
-                url: "{{ url('edit-User') }}",
-                data: {
-                    id: id
-                },
-                dataType: 'json',
-                success: function(res) {
-                    $('#modal-default-title').html("Edit User");
-                    $('#modal-default').modal('show');
-                    $('#id').val(res.id);
-                    $('#name').val(res.name);
-                    $('#address').val(res.address);
-                    $('#email').val(res.email);
-                }
-            });
+        function editFunc(datas) {
+            const data = datas.dataset;
+            $('#modal-default-title').html("Edit User");
+            $('#modal-default').modal('show');
+            $('#UserForm').trigger("reset");
+            $('#id').val(data.id);
+            $('#name').val(data.name);
+            $('#email').val(data.email);
+            $('#role').val(data.role);
+            $('#active').val(data.active);
+            $('#password').removeAttr('required');
         }
 
         function deleteFunc(id) {

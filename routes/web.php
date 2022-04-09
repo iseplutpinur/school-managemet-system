@@ -58,8 +58,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'verified', 
     Route::group(['prefix' => 'user'], function () {
         Route::get('/', [UserController::class, 'index'])->name('admin.user');
         Route::post('/', [UserController::class, 'store'])->name('admin.user.store');
-        Route::delete('/', [UserController::class, 'delete'])->name('admin.user.delete');
-        Route::put('/', [UserController::class, 'put'])->name('admin.user.put');
+        Route::delete('/{id}', [UserController::class, 'delete'])->name('admin.user.delete');
+        Route::post('/update', [UserController::class, 'update'])->name('admin.user.update');
     });
 });
 

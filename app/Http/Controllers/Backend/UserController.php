@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Rules\Password;
 use Illuminate\Support\Facades\Hash;
 use League\Config\Exception\ValidationException;
@@ -69,6 +68,53 @@ class UserController extends Controller
                 'active' => $request->active,
                 'password' => Hash::make($request->password),
             ]);
+            return response()->json();
+        } catch (ValidationException $error) {
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $error,
+            ], 500);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            $user_role = implode(",", User::getAllRole());
+            $user = User::find($request->id);
+            $request->validate([
+                'id' => ['required', 'int'],
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+                'role' => ['required', 'string', 'in:' . $user_role],
+                'active' => ['required', 'int', 'in:1,0'],
+                'password' => $request->password ? ['required', 'string', new Password] : ''
+            ]);
+
+            if ($request->password) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->role = $request->role;
+            $user->active = $request->active;
+
+            $user->save();
+            return response()->json();
+        } catch (ValidationException $error) {
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $error,
+            ], 500);
+        }
+    }
+
+    public function delete(Request $user)
+    {
+        try {
+            $user = User::find($user->id);
+            $user->delete();
             return response()->json();
         } catch (ValidationException $error) {
             return response()->json([
