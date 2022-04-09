@@ -1297,7 +1297,7 @@ class AddressRegenciesSeeder extends Seeder
 
     public static function import_86()
     {
-        echo 'Import address regencies: 100%\n';
+        echo 'Import address regencies: 100%' . PHP_EOL;
         AddressRegencies::insert([
             ['id' => '9435', 'province_id' => '94', 'name' => 'KABUPATEN INTAN JAYA'],
             ['id' => '9436', 'province_id' => '94', 'name' => 'KABUPATEN DEIYAI'],

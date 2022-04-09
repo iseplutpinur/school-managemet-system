@@ -8058,7 +8058,7 @@ class AddressDistrictsSeeder extends Seeder
 
     public static function import_99()
     {
-        echo 'Import address districts: 100%\n';
+        echo 'Import address districts: 100%' . PHP_EOL;
         AddressDistricts::insert([
             ['id' => '9431020', 'regency_id' => '9431', 'name' => 'ILUGWA'],
             ['id' => '9431030', 'regency_id' => '9431', 'name' => 'KELILA'],
