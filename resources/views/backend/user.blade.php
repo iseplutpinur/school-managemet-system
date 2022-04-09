@@ -60,9 +60,9 @@
     <!-- modal Area -->
     <div class="modal fade" id="modal-default">
         <div class="modal-dialog" role="document">
-            <div class="modal-content rounded15">
+            <div class="modal-content rounded15 bg-success">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="modal-default-title"></h4>
+                    <h4 class="modal-title text-light" id="modal-default-title"></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span></button>
                 </div>
@@ -72,26 +72,24 @@
                         <input type="hidden" name="id" id="id">
                         <div class="form-group">
                             <label for="name">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="name" name="name" data-validation-required-mes
-                                sage="This field is required" placeholder="Enter Name" maxlength="50" required="" />
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name"
+                                required="" />
+
                         </div>
                         <div class="form-group">
-                            <label for="name">Email <span class="text-danger">*</span></label>
+                            <label for="email">Email <span class="text-danger">*</span></label>
                             <input type="email" id="email" name="email" class="form-control" placeholder="Email Address"
-                                data-validation-regex-regex="([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})"
-                                data-validation-regex-message="Enter Valid Email" aria-invalid="false" required="" />
+                                required="" />
                             <div class="help-block"></div>
                         </div>
                         <div class="form-group ">
-                            <label for="name">Password <span class="text-danger">*</span></label>
+                            <label for="password">Password <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="password" name="password"
-                                placeholder="Enter Password" maxlength="50" required="" data-validation-required-mes
-                                sage="This field is required">
+                                placeholder="Enter Password" required="">
                         </div>
                         <div class="form-group">
-                            <label>User Role</label>
-                            <select class="form-control" style="width: 100%;" required="" id="role" name="role"
-                                data-validation-required-mes sage="This field is required">
+                            <label for="role">User Role</label>
+                            <select class="form-control" style="width: 100%;" required="" id="role" name="role">
                                 @foreach ($user_role as $role)
                                     <option value="{{ $role }}">
                                         {{ ucfirst(implode(' ', explode('_', $role))) }}
@@ -100,9 +98,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Active</label>
-                            <select class="form-control" style="width: 100%;" required="" id="active" name="active"
-                                data-validation-required-mes sage="This field is required">
+                            <label for="active">Active</label>
+                            <select class="form-control" style="width: 100%;" required="" id="active" name="active">
                                 <option value="1">Yes</option>
                                 <option value="0">No</option>
                             </select>
@@ -126,7 +123,7 @@
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content rounded15">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="modal-default-title">Delete Form</h4>
+                    <h4 class="modal-title" id="modal-delete-title">Delete Form</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span></button>
                 </div>
@@ -156,12 +153,14 @@
 
 @section('javascript')
     <script src="{{ asset('backend/assets/vendor_components/datatable/datatables.min.js') }}"></script>
-    <script src="{{ asset('backend/js/pages/validation.js') }}"></script>
+    {{-- <script src="{{ asset('backend/js/pages/validation.js') }}"></script> --}}
     {{-- <script src="{{ asset('backend/assets/vendor_components/select2/dist/js/select2.full.js') }}"></script> --}}
+
     <script>
+        let errorAfterInput = [];
         $(document).ready(function() {
-            $("input,select,textarea").not("[type=submit]").jqBootstrapValidation();
-            // $('.select2').select2();
+
+            // datatable ====================================================================================
             const table_html = $('#tbl_main');
             $.ajaxSetup({
                 headers: {
@@ -234,11 +233,21 @@
                     cell.innerHTML = i + 1 + PageInfo.start;
                 });
             });
+            $('#FilterForm').submit(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                var oTable = table_html.dataTable();
+                oTable.fnDraw(false);
+            });
 
+
+
+            // insertForm ===================================================================================
             $('#UserForm').submit(function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
                 setBtnLoading('#btn-save', 'Save Changes');
+                resetErrorAfterInput();
                 $.ajax({
                     type: 'POST',
                     url: "{{ route('admin.user.store') }}",
@@ -264,9 +273,16 @@
                         oTable.fnDraw(false);
                     },
                     error: function(data) {
+                        const res = data.responseJSON ?? {};
+                        errorAfterInput = [];
+                        for (const property in res.errors) {
+                            errorAfterInput.push(property);
+                            setErrorAfterInput(res.errors[property], `#${property}`);
+                        }
+
                         $.toast({
                             heading: 'Failed',
-                            text: 'Data failed to add',
+                            text: res.message ?? 'Something went wrong',
                             position: 'top-right',
                             loaderBg: '#ff6849',
                             icon: 'error',
@@ -280,12 +296,6 @@
                             false);
                     }
                 });
-            });
-            $('#FilterForm').submit(function(e) {
-                e.preventDefault();
-                var formData = new FormData(this);
-                var oTable = table_html.dataTable();
-                oTable.fnDraw(false);
             });
 
             $('#deleteForm').submit(function(e) {
@@ -343,6 +353,7 @@
             $('#modal-default-title').html("Add User");
             $('#modal-default').modal('show');
             $('#id').val('');
+            resetErrorAfterInput();
         }
 
 
@@ -368,6 +379,36 @@
         function deleteFunc(id) {
             $('#delete_id').val(id);
             $('#modal-delete').modal('show');
+        }
+
+        function setErrorAfterInput(error, element) {
+            // get element after input
+            let after = $(element).next();
+            if (after.length == 0) $(element).after('<div></div>');
+            if (after.length == 0) after = $(element).next();
+
+            // highlight
+            $(element).addClass("is-invalid").removeClass("is-valid");
+            let errors = Array.isArray(error) ? '' : `<li class="text-danger">${error}</li>`;
+            if (Array.isArray(error)) {
+                error.forEach(err => {
+                    errors += `<li class="text-danger">${err}</li>`;
+                });
+            }
+
+            after.html(`<div><ul style="padding-left: 20px;">${errors}</ul></div>`);
+        }
+
+        function resetErrorAfterInput() {
+            errorAfterInput.forEach(id => {
+                // get element after input
+                const element = $(`#${id}`);
+                let after = $(element).next();
+                if (after.length == 0) $(element).after('<div></div>');
+                if (after.length == 0) after = $(element).next();
+                $(element).addClass("is-valid").removeClass("is-invalid");
+                after.html('');
+            });
         }
     </script>
 @endsection

@@ -9,7 +9,7 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Rules\Password;
 use Illuminate\Support\Facades\Hash;
-use Exception;
+use League\Config\Exception\ValidationException;
 
 class UserController extends Controller
 {
@@ -46,51 +46,31 @@ class UserController extends Controller
             'navigation' => 'user.view',
         ];
         $user_role = User::getAllRole();
-        return view('backend.view_user', compact('page_attr', 'user_role'));
-    }
-
-    public function check_login(Request $request)
-    {
-        die;
-        $email      = $request->input('email');
-        $password   = $request->input('password');
-
-        if (Auth::guard('web')->attempt(['email' => $email, 'password' => $password])) {
-            return response()->json([
-                'success' => true
-            ], 200);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Login Gagal!'
-            ], 401);
-        }
+        return view('backend.user', compact('page_attr', 'user_role'));
     }
 
     public function store(Request $request)
     {
+
         try {
+            $user_role = implode(",", User::getAllRole());
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'role' => ['required', 'string', 'max:255'],
-                'active' => ['required', 'number', 'max:1'],
+                'role' => ['required', 'string', 'in:' . $user_role],
+                'active' => ['required', 'int', 'in:1,0'],
                 'password' => ['required', 'string', new Password]
             ]);
 
             User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'username' => $request->username,
+                'role' => $request->role,
+                'active' => $request->active,
                 'password' => Hash::make($request->password),
             ]);
-
-            $user = User::where('email', $request->email)->first();
-
-            $tokenResult = $user->createToken('authToken')->plainTextToken;
-
             return response()->json();
-        } catch (Exception $error) {
+        } catch (ValidationException $error) {
             return response()->json([
                 'message' => 'Something went wrong',
                 'error' => $error,
