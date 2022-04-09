@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\AddressRegencies;
+use App\Models\AddressVillages;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -21,6 +23,10 @@ class DatabaseSeeder extends Seeder
             'role' => User::ROLE_ADMIN,
             'active' => '1'
         ]);
-        \App\Models\User::factory(150)->create();
+        // \App\Models\User::factory(150)->create();
+        AddressProvincesSeeder::run();
+        AddressRegenciesSeeder::run();
+        AddressDistrictsSeeder::run();
+        AddressVillagesSeeder::run();
     }
 }
