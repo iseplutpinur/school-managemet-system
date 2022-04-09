@@ -1,13 +1,16 @@
 <?php
-
+// utility
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
 
-// user
+// model
+use App\Models\User;
+
+// controller
 use App\Http\Controllers\Backend\UserController;
-
 use App\Http\Controllers\CompanyController;
-
+use App\Http\Controllers\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,24 +23,48 @@ use App\Http\Controllers\CompanyController;
 |
 */
 
+// home default
 Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return view('admin.index', ['page_attr' => ['title' => 'Dashboard']]);
+// auth
+Route::get('/login', [LoginController::class, 'index'])->name('login');
+Route::get('/login2', [LoginController::class, 'index'])->name('login2');
+Route::post('/login', [LoginController::class, 'check_login'])->name('login.check_login');
+Route::get('/logout', [LoginController::class, 'logout'])->name('login.logout');
+
+Route::get('/home', function () {
+    $user = Auth::user();
+    $role = isset($user->role) ? $user->role : null;
+    switch ($role) {
+        case User::ROLE_ADMIN:
+            return Redirect::route('admin.dashboard');
+            break;
+
+        default:
+            return '';
+            break;
+    }
 })->name('dashboard');
 
-Route::get('admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
-
-
 // user management all route
-Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'verified']], function () {
-    Route::get('view', [UserController::class, 'userView'])->name('user.view');
-    Route::get('add', [UserController::class, 'userAdd'])->name('user.add');
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'verified', 'admin']], function () {
+    Route::get('/dashboard', function () {
+        return view('admin.index', ['page_attr' => ['title' => 'Dashboard']]);
+    })->name('admin.dashboard');
+
+    // user
+    Route::group(['prefix' => 'user'], function () {
+        Route::get('/', [UserController::class, 'index'])->name('admin.user');
+        Route::post('/', [UserController::class, 'store'])->name('admin.user.store');
+        Route::delete('/', [UserController::class, 'delete'])->name('admin.user.delete');
+        Route::put('/', [UserController::class, 'put'])->name('admin.user.put');
+    });
 });
 
 
+// learn
 Route::get('ajax-crud-datatable', [CompanyController::class, 'index'])->name('company');
 Route::post('store-company', [CompanyController::class, 'store']);
 Route::post('edit-company', [CompanyController::class, 'edit']);

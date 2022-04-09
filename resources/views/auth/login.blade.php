@@ -66,13 +66,14 @@
                                         </div>
                                     </div>
                                     @if (Route::has('password.request'))
-                                    <!-- /.col -->
-                                    <div class="col-6">
-                                        <div class="fog-pwd text-right">
-                                            <a href="{{ route('password.request') }}" class="text-white hover-info"><i
-                                                    class="ion ion-locked"></i> Forgot pwd?</a><br>
+                                        <!-- /.col -->
+                                        <div class="col-6">
+                                            <div class="fog-pwd text-right">
+                                                <a href="{{ route('password.request') }}"
+                                                    class="text-white hover-info"><i class="ion ion-locked"></i> Forgot
+                                                    pwd?</a><br>
+                                            </div>
                                         </div>
-                                    </div>
                                     @endif
                                     <!-- /.col -->
                                     <div class="col-12 text-center">
@@ -96,10 +97,10 @@
                                 </p>
                             </div>
                             @if (Route::has('register'))
-                            <div class="text-center">
-                                <p class="mt-15 mb-0 text-white">Don't have an account? <a
-                                        href="{{ route('register') }}" class="text-info ml-5">Sign Up</a></p>
-                            </div>
+                                <div class="text-center">
+                                    <p class="mt-15 mb-0 text-white">Don't have an account? <a
+                                            href="{{ route('register') }}" class="text-info ml-5">Sign Up</a></p>
+                                </div>
                             @endif
                         </div>
                     </div>

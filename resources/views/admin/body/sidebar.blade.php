@@ -1,105 +1,85 @@
 <?php
-    // variable declaration
-    $menus = [];
+// variable declaration
+$menus = [];
 
-    $menus[] = [ 'title' => 'Dashboard', 'route' =>'dashboard', 'icon' => '<i data-feather="pie-chart"></i>'];
-    $menus[] = [ 'title' => 'Manage User',
-        'icon' => '<i data-feather="message-circle"></i>',
-        'children' => [
-            ['title' => 'View User', 'route' => 'user.view'],
-            ['title' => 'Add User', 'route' => 'user.add'],
-        ]
-    ];
+$menus[] = ['title' => 'Dashboard', 'route' => 'admin.dashboard', 'icon' => '<i data-feather="pie-chart"></i>'];
+$menus[] = [
+    'title' => 'Manage User',
+    'icon' => '<i data-feather="message-circle"></i>',
+    'route' => 'admin.user',
+    // 'children' => [['title' => 'View User', 'route' => 'admin.user']],
+];
 
-    $menus[] = [ 'title' => 'Mail Box',
-        'icon' => '<i data-feather="mail"></i>',
-        'children' => [
-            ['title' => 'Inbox'],
-            ['title' => 'Compose'],
-            ['title' => 'Read'],
-        ]
-    ];
+$menus[] = ['title' => 'Mail Box', 'icon' => '<i data-feather="mail"></i>', 'children' => [['title' => 'Inbox'], ['title' => 'Compose'], ['title' => 'Read']]];
 
-    // separator example
-    $menus[] = [ 'title' => 'Datatable', 'separator' => true ];
+// separator example
+$menus[] = ['title' => 'Datatable', 'separator' => true];
 
-    $menus[] = [ 'title' => 'Company', 'icon' => '<i data-feather="grid"></i>', 'route'=>'company'];
+$menus[] = ['title' => 'Company', 'icon' => '<i data-feather="grid"></i>', 'route' => 'company'];
 
-    $menus[] = [ 'title' => 'Components',
-        'icon' => '<i data-feather="grid"></i>',
-        'children' => [
-            ['title' => 'Alerts'],
-            ['title' => 'Badge'],
-            ['title' => 'Buttons'],
-            ['title' => 'Sliders'],
-            ['title' => 'Dropdown'],
-            ['title' => 'Modal'],
-            ['title' => 'Nestable'],
-            ['title' => 'Progress Bars'],
-        ]
-    ];
+$menus[] = ['title' => 'Components', 'icon' => '<i data-feather="grid"></i>', 'children' => [['title' => 'Alerts'], ['title' => 'Badge'], ['title' => 'Buttons'], ['title' => 'Sliders'], ['title' => 'Dropdown'], ['title' => 'Modal'], ['title' => 'Nestable'], ['title' => 'Progress Bars']]];
 
-
-
-
-    // main function
-    function sidebarMenu(Array $menus, $navigation):string {
-        function checkActive($route, $navigation):bool {
-            return request()->routeIs($route) || ($navigation == $route);
-        }
-
-        function filterMenu($menu, $navigation):object{
-            $title = isset($menu['title']) ? $menu['title'] : '';
-            $icon = isset($menu['icon']) ? $menu['icon'] : '';
-            $route = isset($menu['route']) ? $menu['route'] : '#';
-            $active = checkActive($route, $navigation);
-            $active_class = $active ? 'active' : '';
-            $route = $route == '#' ? '#' : route($route);
-
-            return (object)[
-                'title' => $title,
-                'route' => $route,
-                'icon' => $icon,
-                'active' => $active,
-                'active_class' => $active_class,
-            ];
-        }
-
-        $menu_body = '';
-        foreach ($menus as  $menu) {
-            // 1 check separator
-            $separator = isset($menu['separator']) ? $menu['separator'] : false;
-
-            // 2 check children
-            $children = isset($menu['children']) ? $menu['children'] : false;
-
-            if ($separator) {
-                $menu_body .= '<li class="header nav-small-cap">'. $menu['title'] . '</li>';
-            }else if (is_array($children)) {
-                $child_menu = '';
-                $active = false;
-                foreach ($children as  $child) {
-                    $child_filter = filterMenu($child, $navigation);
-                    $child_menu .= '<li class="'.$child_filter->active_class.'"><a href="'.$child_filter->route.'"><i class="ti-more"></i>'.$child_filter->title.'</a></li>';
-                    if ($child_filter->active) $active = $child_filter->active;
-                }
-                $active_1 = $active ? ' menu-open active' : '';
-                $active_2 = $active ? ' style="display: block;"' : '';
-                $menu = filterMenu($menu, $navigation);
-                $menu_body .= '<li class="treeview '.$active_1.'"><a href="#">'.$menu->icon.'<span>'.$menu->title.'</span><span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span></a><ul class="treeview-menu" '. $active_2 .'>'. $child_menu .'</ul></li>';
-
-            }else{
-                $menu = filterMenu($menu, $navigation);
-                $menu_body .= "<li class=\"$menu->active_class\"> <a href=\"$menu->route\"> $menu->icon <span>$menu->title</span> </a> </li>";
-            }
-
-        }
-
-        $menu_head = '<ul class="sidebar-menu" data-widget="tree">';
-        $menu_footer = '<li><a href="' . route('admin.logout') . '"><i data-feather="lock"></i><span>Log Out</span></a></li></ul>';
-
-        return $menu_head.$menu_body.$menu_footer;
+// main function
+function sidebarMenu(array $menus, $navigation): string
+{
+    function checkActive($route, $navigation): bool
+    {
+        return request()->routeIs($route) || $navigation == $route;
     }
+
+    function filterMenu($menu, $navigation): object
+    {
+        $title = isset($menu['title']) ? $menu['title'] : '';
+        $icon = isset($menu['icon']) ? $menu['icon'] : '';
+        $route = isset($menu['route']) ? $menu['route'] : '#';
+        $active = checkActive($route, $navigation);
+        $active_class = $active ? 'active' : '';
+        $route = $route == '#' ? '#' : route($route);
+
+        return (object) [
+            'title' => $title,
+            'route' => $route,
+            'icon' => $icon,
+            'active' => $active,
+            'active_class' => $active_class,
+        ];
+    }
+
+    $menu_body = '';
+    foreach ($menus as $menu) {
+        // 1 check separator
+        $separator = isset($menu['separator']) ? $menu['separator'] : false;
+
+        // 2 check children
+        $children = isset($menu['children']) ? $menu['children'] : false;
+
+        if ($separator) {
+            $menu_body .= '<li class="header nav-small-cap">' . $menu['title'] . '</li>';
+        } elseif (is_array($children)) {
+            $child_menu = '';
+            $active = false;
+            foreach ($children as $child) {
+                $child_filter = filterMenu($child, $navigation);
+                $child_menu .= '<li class="' . $child_filter->active_class . '"><a href="' . $child_filter->route . '"><i class="ti-more"></i>' . $child_filter->title . '</a></li>';
+                if ($child_filter->active) {
+                    $active = $child_filter->active;
+                }
+            }
+            $active_1 = $active ? ' menu-open active' : '';
+            $active_2 = $active ? ' style="display: block;"' : '';
+            $menu = filterMenu($menu, $navigation);
+            $menu_body .= '<li class="treeview ' . $active_1 . '"><a href="#">' . $menu->icon . '<span>' . $menu->title . '</span><span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span></a><ul class="treeview-menu" ' . $active_2 . '>' . $child_menu . '</ul></li>';
+        } else {
+            $menu = filterMenu($menu, $navigation);
+            $menu_body .= "<li class=\"$menu->active_class\"> <a href=\"$menu->route\"> $menu->icon <span>$menu->title</span> </a> </li>";
+        }
+    }
+
+    $menu_head = '<ul class="sidebar-menu" data-widget="tree">';
+    $menu_footer = '<li><a href="' . route('login.logout') . '"><i data-feather="lock"></i><span>Log Out</span></a></li></ul>';
+
+    return $menu_head . $menu_body . $menu_footer;
+}
 ?>
 
 <!-- Left side column. contains the logo and sidebar -->
@@ -132,7 +112,7 @@
         <a href="mailbox_inbox.html" class="link" data-toggle="tooltip" title="" data-original-title="Email"><i
                 class="ti-email"></i></a>
         <!-- item-->
-        <a href="{{ route('admin.logout') }}" class="link" data-toggle="tooltip" title=""
+        <a href="{{ route('login.logout') }}" class="link" data-toggle="tooltip" title=""
             data-original-title="Logout"><i class="ti-lock"></i></a>
     </div>
 </aside>
@@ -143,7 +123,8 @@
                 class="fa fa-times text-white"></i></span> </div>
     <!-- Create the tabs -->
     <ul class="nav nav-tabs control-sidebar-tabs">
-        <li class="nav-item"><a href="#control-sidebar-home-tab" data-toggle="tab" class="active">Chat</a></li>
+        <li class="nav-item"><a href="#control-sidebar-home-tab" data-toggle="tab" class="active">Chat</a>
+        </li>
         <li class="nav-item"><a href="#control-sidebar-settings-tab" data-toggle="tab">Todo</a></li>
     </ul>
     <!-- Tab panes -->

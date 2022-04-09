@@ -4,7 +4,7 @@
     <div class="box">
         <div class="box-header with-border">
             <div class="d-md-flex flex-row justify-content-between">
-                <h3 class="box-title">Company List</h3>
+                <h3 class="box-title">User List</h3>
                 <button type="button" class="btn btn-rounded btn-success" data-toggle="modal" onclick="add()"
                     data-target="#modal-default">
                     <i data-feather="plus"></i> Add
@@ -13,6 +13,30 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
+            <form action="javascript:void(0)" class="form-inline ml-md-3 mb-md-3" id="FilterForm">
+                <div class="form-group mr-md-3">
+                    <label for="filter_role">User Role</label>
+                    <select class="form-control" id="filter_role" name="filter_role" style="max-width: 200px">
+                        <option value="">All User Role</option>
+                        @foreach ($user_role as $role)
+                            <option value="{{ $role }}">
+                                {{ ucfirst(implode(' ', explode('_', $role))) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group mr-md-3">
+                    <label for="filter_active">User Active</label>
+                    <select class="form-control" id="filter_active" name="filter_active" style="max-width: 200px">
+                        <option value="">All User Active</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-rounded btn-md btn-info" title="Refresh Filter Table">
+                    <i data-feather="refresh-cw" style="width: 15px; height: 15px; margin-right: 4px"></i> Refresh
+                </button>
+            </form>
             <div class="table-responsive">
                 <table id="tbl_main" class="table table-bordered table-striped">
                     <thead>
@@ -20,19 +44,19 @@
                             <th>No</th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Address</th>
-                            <th>Created at</th>
+                            <th>User Role</th>
+                            <th>Active</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody> </tbody>
+                    <tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
         <!-- /.box-body -->
     </div>
     <!-- /.box -->
-
     <!-- modal Area -->
     <div class="modal fade" id="modal-default">
         <div class="modal-dialog" role="document">
@@ -43,23 +67,45 @@
                         <span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <form action="javascript:void(0)" id="CompanyForm" name="CompanyForm" class="form-horizontal"
-                        method="POST" enctype="multipart/form-data">
+                    <form action="javascript:void(0)" id="UserForm" name="UserForm" class="form-horizontal" method="POST"
+                        enctype="multipart/form-data">
                         <input type="hidden" name="id" id="id">
                         <div class="form-group">
-                            <label for="name">Company Name</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter Company Name"
-                                maxlength="50" required="">
+                            <label for="name">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" data-validation-required-mes
+                                sage="This field is required" placeholder="Enter Name" maxlength="50" required="" />
                         </div>
                         <div class="form-group">
-                            <label for="name">Company Email</label>
-                            <input type="email" class="form-control" id="email" name="email"
-                                placeholder="Enter Company Email" maxlength="50" required="">
+                            <label for="name">Email <span class="text-danger">*</span></label>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Email Address"
+                                data-validation-regex-regex="([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})"
+                                data-validation-regex-message="Enter Valid Email" aria-invalid="false" required="" />
+                            <div class="help-block"></div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="name">Password <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="password" name="password"
+                                placeholder="Enter Password" maxlength="50" required="" data-validation-required-mes
+                                sage="This field is required">
                         </div>
                         <div class="form-group">
-                            <label>Company Address</label>
-                            <input type="text" class="form-control" id="address" name="address"
-                                placeholder="Enter Company Address" required="">
+                            <label>User Role</label>
+                            <select class="form-control" style="width: 100%;" required="" id="role" name="role"
+                                data-validation-required-mes sage="This field is required">
+                                @foreach ($user_role as $role)
+                                    <option value="{{ $role }}">
+                                        {{ ucfirst(implode(' ', explode('_', $role))) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Active</label>
+                            <select class="form-control" style="width: 100%;" required="" id="active" name="active"
+                                data-validation-required-mes sage="This field is required">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
                         </div>
                     </form>
                 </div>
@@ -67,7 +113,7 @@
                     <button type="button" class="btn btn-rounded btn-danger" data-dismiss="modal">
                         <li class="fa fa-times "></li> Close
                     </button>
-                    <button type="submmit" class="btn btn-rounded btn-primary float-right" id="btn-save" form="CompanyForm">
+                    <button type="submmit" class="btn btn-rounded btn-primary float-right" id="btn-save" form="UserForm">
                         <li class="fa fa-save mr-1"></li> Save changes
                     </button>
                 </div>
@@ -110,8 +156,12 @@
 
 @section('javascript')
     <script src="{{ asset('backend/assets/vendor_components/datatable/datatables.min.js') }}"></script>
-    <script type="text/javascript">
+    <script src="{{ asset('backend/js/pages/validation.js') }}"></script>
+    {{-- <script src="{{ asset('backend/assets/vendor_components/select2/dist/js/select2.full.js') }}"></script> --}}
+    <script>
         $(document).ready(function() {
+            $("input,select,textarea").not("[type=submit]").jqBootstrapValidation();
+            // $('.select2').select2();
             const table_html = $('#tbl_main');
             $.ajaxSetup({
                 headers: {
@@ -119,9 +169,17 @@
                 }
             });
             const new_table = table_html.DataTable({
+                searchDelay: 500,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('company') }}",
+                type: 'GET',
+                ajax: {
+                    url: "{{ route('admin.user') }}",
+                    data: function(d) {
+                        d['filter[active]'] = $('#filter_active').val();
+                        d['filter[role]'] = $('#filter_role').val();
+                    }
+                },
                 columns: [{
                         data: null,
                         name: 'id',
@@ -136,15 +194,21 @@
                         name: 'email'
                     },
                     {
-                        data: 'address',
-                        name: 'address'
+                        data: 'role_str',
+                        name: 'role'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'active_str',
+                        name: 'active',
+                        render(data, type, full, meta) {
+                            const class_el = full.active == 1 ? 'badge badge-success' :
+                                'badge badge-danger';
+                            return `<span class="${class_el}">${full.active_str}</span>`;
+                        },
                     },
                     {
                         data: 'id',
+                        name: 'id',
                         render(data, type, full, meta) {
                             return `
                             <button type="button" class="btn btn-rounded btn-primary" title="Edit Data" onClick="editFunc('${data}')">
@@ -155,7 +219,6 @@
                             </button>
                         `;
                         },
-                        name: 'id',
                         orderable: false
                     },
                 ],
@@ -172,13 +235,13 @@
                 });
             });
 
-            $('#CompanyForm').submit(function(e) {
+            $('#UserForm').submit(function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
                 setBtnLoading('#btn-save', 'Save Changes');
                 $.ajax({
                     type: 'POST',
-                    url: "{{ url('store-company') }}",
+                    url: "{{ route('admin.user.store') }}",
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -218,14 +281,20 @@
                     }
                 });
             });
+            $('#FilterForm').submit(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                var oTable = table_html.dataTable();
+                oTable.fnDraw(false);
+            });
 
             $('#deleteForm').submit(function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
                 setBtnLoading('#btn-save-delete', 'Delete');
                 $.ajax({
-                    type: "POST",
-                    url: "{{ url('delete-company') }}",
+                    type: "DELETE",
+                    url: "{{ route('admin.user.delete') }}",
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -270,22 +339,23 @@
         });
 
         function add() {
-            $('#CompanyForm').trigger("reset");
-            $('#modal-default-title').html("Add Company");
+            $('#UserForm').trigger("reset");
+            $('#modal-default-title').html("Add User");
             $('#modal-default').modal('show');
             $('#id').val('');
         }
 
+
         function editFunc(id) {
             $.ajax({
                 type: "POST",
-                url: "{{ url('edit-company') }}",
+                url: "{{ url('edit-User') }}",
                 data: {
                     id: id
                 },
                 dataType: 'json',
                 success: function(res) {
-                    $('#modal-default-title').html("Edit Company");
+                    $('#modal-default-title').html("Edit User");
                     $('#modal-default').modal('show');
                     $('#id').val(res.id);
                     $('#name').val(res.name);
@@ -301,7 +371,7 @@
         }
     </script>
 @endsection
-
 @section('stylesheet')
     <link rel="stylesheet" href="{{ asset('backend/assets/vendor_components/datatable/datatables.min.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('backend/assets/vendor_components/select2/dist/css/select2.min.css') }}"> --}}
 @endsection

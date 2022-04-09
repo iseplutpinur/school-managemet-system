@@ -12,8 +12,8 @@ class CompanyController extends Controller
     {
         if (request()->ajax()) {
             return Datatables::of(Company::query())
-                ->addColumn('action', 'company-action')
-                ->rawColumns(['action'])
+                // ->addColumn('action', 'company-action')
+                // ->rawColumns(['action'])
                 ->addIndexColumn()
                 ->make(true);
         }
